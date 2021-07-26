@@ -11,7 +11,7 @@ const server = http.createServer((req, res) => {
     res.write('</html>');
     return res.end();
   }
-  
+
   if (url === "/message" && method === "POST") {
     const body = [];
     req.on("data", (chunk) => {
@@ -21,12 +21,13 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       const parseBody = Buffer.concat(body).toString();
       const message = parseBody.split("=")[1];
-      fs.writeFileSync("message.txt", message);
+      fs.writeFile("message.txt", message, (error) => {
+        res.writeHead(302, {
+          "Location": "/"
+        });
+        return res.end();
+      });
     });
-    res.writeHead(302, {
-      "Location": "/"
-    });
-    return res.end();
   }
 
   res.setHeader("Content-Type", "text/html");
